@@ -44,7 +44,7 @@ The recommendation system demonstrates promising performance in predicting user-
 
 ## Contributors
 
-- [Sharvari Kalgutkar]
+- Sharvari Kalgutkar
 
 
 
