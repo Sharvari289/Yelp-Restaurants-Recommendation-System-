@@ -8,6 +8,13 @@ The files **app.py** and **RecommendationSystem.py**, which house the primary Sp
 ## Demo Video
 
 
+
+https://github.com/Sharvari289/Yelp-Restaurants-Recommendation-System-/assets/63462866/2cecdaab-60e6-4c43-9eb2-829157408156
+
+
+
+
+
 ## Features
 - **XGBoost-Regressor based Recommendation**: Utilizes XGBoost (XGB) as the primary recommendation engine.
 - **Collaborative Filtering**: Utilizes item-based collaborative filtering with Pearson Similarity to provide accurate recommendations by analyzing item similarities.
