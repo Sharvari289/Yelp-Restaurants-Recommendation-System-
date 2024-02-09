@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendation Score</title>
+   
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles_scorepage.css') }}">
+
+</head>
+<body>
+    
+<div style="padding-left:2rem; padding-top: 2rem;">
+    <a href="/"  class="tab-button">Home</a>
+</div> 
+ 
+        
+
+  <h2 id="score-heading" style="margin-top:5rem">Recommendation Score: {{ dis_score}} </h2>
+
+
+
+  <div class="top-container">
+
+  
+  <div class="user-cards"  id="user-cards">
+    <div class="card profile-card">
+      <div class="center">
+        <div class="profile">
+            <div class="image">
+                <div class="circle-1"></div>
+                <div class="circle-2"></div>
+                <img src="{{user.image}}" width="70" height="70" alt="{{user.name}}">
+            </div>
+
+            <div class="name">{{user.name}}</div>
+            <div class="yelpingsince">{{user.yelping_since}}</div>
+
+           
+        </div>
+
+        <div class="stats">
+            <div class="box">
+                <span class="value">{{user.review_count}}</span>
+                <span class="parameter">Review Count</span>
+            </div>
+            <div class="box">
+                <span class="value">{{user.average_stars}}</span>
+                <span class="parameter">Average Stars</span>
+            </div>
+            <div class="box">
+                <span class="value">{{user.useful}}</span>
+                <span class="parameter">Useful Reviews</span>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+   
+    <div class="circular-progress" data-inner-circle-color="white"  data-progress-color="#ff3b30" data-bg-color="white">
+      <div class="inner-circle"></div>
+      <p class="percentage">0%</p>
+    </div>
+
+
+
+  <div class="business-cards" id="business-cards">
+     <div class="card profile-card">
+
+      <div class="center">
+        <div class="profile">
+            <div class="image">
+                <div class="circle-1"></div>
+                <div class="circle-2"></div>
+                <img src="{{business.image}}" width="70" height="70" alt="{{business.name}}">
+            </div>
+
+            <div class="name">{{business.name }}</div>
+            <div class="yelpingsince">{{business.address}},{{business.city}},{{business.state }}</div>
+        
+            <div class="categories">{{business.categories }}</div>
+
+
+           
+        </div>
+
+        <div class="stats">
+            <div class="box">
+                <span class="value">{{business.review_count }}</span>
+                <span class="parameter">Review Count</span>
+            </div>
+            <div class="box">
+                <span class="value">{{business.stars }}</span>
+                <span class="parameter">Average Stars</span>
+            </div>
+            <div class="box">
+                <span class="value">{{business.hours.Saturday}}</span>
+                <span class="parameter">Hours</span>
+            </div>
+          
+        </div>
+    </div>
+     </div>
+  </div>
+
+ <div>
+    
+ </div>
+
+
+  
+
+
+
+
+
+    <script>
+      const circularProgress = document.querySelectorAll(".circular-progress");
+
+      Array.from(circularProgress).forEach((progressBar) => {
+
+            let result = {{ recommendation_score | tojson | safe }};
+
+            const jsonObject = JSON.parse(result);
+
+            
+            const resultValue = jsonObject.score;
+
+           
+           
+
+            const progressValue = progressBar.querySelector(".percentage");
+            const innerCircle = progressBar.querySelector(".inner-circle");
+            let startValue = 0,
+                startRating=0,
+              endValue = resultValue,
+              endrating= resultValue,
+
+              speed = 75,
+              progressColor = progressBar.getAttribute("data-progress-color");
+              endValue=Math.round(endValue*100/5);
+
+            const progress = setInterval(() => {
+              startRating=startRating+0.05;
+              startValue++;
+
+            
+             if (startValue>=33 & startValue<66){
+              progressColor='#ff9500'
+
+             }
+             else if (startValue>=66){
+              progressColor='#28cd41'
+             }
+
+        
+
+              show_rating= Math.round(startRating * 10) / 10;
+              progressValue.textContent = `${show_rating}` ;
+              progressValue.style.color = `${progressColor}`;
+
+              innerCircle.style.backgroundColor = `${progressBar.getAttribute(
+                "data-inner-circle-color"
+              )}`;
+
+              progressBar.style.background = `conic-gradient(${progressColor} ${
+                startValue * 3.6
+              }deg,${progressBar.getAttribute("data-bg-color")} 0deg)`;
+              if (startValue === endValue) {
+                clearInterval(progress);
+              }
+            }, speed);
+          });
+
+
+
+        const user_id_placeholder = "{{ user.user_id }}"; 
+
+       
+
+
+       
+</script>
+</body>
+</html>

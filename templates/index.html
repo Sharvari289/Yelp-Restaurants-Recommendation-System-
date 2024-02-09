@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yelp User Recommendation System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles_index.css') }}">
+
+</head>
+<body>
+
+    <h1>Yelp Recommendation System</h1>
+    
+
+    <div class="tab">
+        <div class="tab-button" data-view="user" onclick="changeView('user')">User</div>
+        <div id="predict-container">
+            <button id="predict-button" onclick="predict()">Predict</button>
+        </div>
+        <div class="tab-button" data-view="business" onclick="changeView('business')">Business</div>
+    </div>
+    
+
+    <div class="user-cards" style="display:none;" id="user-cards">
+        <!-- User cards will be dynamically generated here -->
+    </div>
+
+    <div class="business-cards" style="display:none;" id="business-cards">
+        <!-- Business cards will be dynamically generated here -->
+    </div>
+
+  
+
+    <div id="recommendation-score">
+        <!-- Recommendation score will be displayed here -->
+    </div>
+
+    <script>
+        let userData = [];
+        let businessData = [];
+        let selectedUserIndex = null;
+        let selectedBusinessIndex = null;
+        let user_selected = null;  
+
+        function fetchData() {
+            // Fetch user data
+            fetch('/api/user_data')
+                .then(response => response.json())
+                .then(data => {
+                    userData = data;
+                    createCarduser(document.getElementById("user-cards"), userData, onUserCardClick);
+                });
+
+            // Fetch business data
+            fetch('/api/business_data')
+                .then(response => response.json())
+                .then(data => {
+                    businessData = data;
+                    createCardBusiness(document.getElementById("business-cards"), businessData, onBusinessCardClick);
+                });
+        }
+
+        fetchData(); // Fetch data when the page loads
+        function changeView(view) {
+    // Reset styles and data when switching views
+    document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+    document.querySelector(".user-cards").style.display = 'none';
+    document.querySelector(".business-cards").style.display = 'none';
+    document.getElementById("predict-button").style.display = 'none';
+    document.getElementById("recommendation-score").style.display = 'none';
+    updatePredictButtonState();
+
+    if (view === 'user') {
+        document.querySelector('.user-cards').style.display = 'flex';
+        document.getElementById("predict-button").style.display = 'block';
+    } else if (view === 'business') {
+        document.querySelector('.business-cards').style.display = 'flex';
+        document.getElementById("predict-button").style.display = 'block';
+    }
+
+    document.querySelector(`.tab-button[data-view='${view}']`).classList.add('active');
+
+    // Hide inactive tab's cards
+    const inactiveTab = view === 'user' ? 'business' : 'user';
+    document.querySelector(`.${inactiveTab}-cards`).style.display = 'none';
+}
+
+
+
+        // Function to create card elements
+        function createCarduser(parentElement, dataArray, clickHandler) {
+            dataArray.forEach((data, index) => {
+                const card = document.createElement("div");
+                card.className = "card profile-card";
+                card.innerHTML = `
+                    <div class="center">
+                        <div class="profile">
+                            <div class="image">
+                                <div class="circle-1"></div>
+                                <div class="circle-2"></div>
+                                <img src="${data.image || 'https://via.placeholder.com/360x500'}" width="70" height="70" alt="${data.name}">
+                            </div>
+
+                            <div class="name">${data.name || 'N/A'}</div>
+                            <div class="yelpingsince">${data.yelping_since || 'N/A'}</div>
+
+                           
+                        </div>
+
+                        <div class="stats">
+                            <div class="box">
+                                <span class="value">${data.review_count || 'N/A'}</span>
+                                <span class="parameter">Review Count</span>
+                            </div>
+                            <div class="box">
+                                <span class="value">${data.average_stars || 'N/A'}</span>
+                                <span class="parameter">Average Stars</span>
+                            </div>
+                            <div class="box">
+                                <span class="value">${data.useful || '0'}</span>
+                                <span class="parameter">Useful Reviews</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                card.addEventListener("click", () => clickHandler(index));
+                parentElement.appendChild(card);
+            });
+        }
+
+
+        // Function to create card elements
+        function createCardBusiness(parentElement, dataArray, clickHandler) {
+
+            dataArray.forEach((data, index) => {
+                const card = document.createElement("div");
+                card.className = "card profile-card";
+                card.innerHTML = `
+                    <div class="center">
+                        <div class="profile">
+                            <div class="image">
+                                <div class="circle-1"></div>
+                                <div class="circle-2"></div>
+                                <img src="${data.image || 'https://via.placeholder.com/360x500'}" width="70" height="70" alt="${data.name}">
+                            </div>
+
+                            <div class="name">${data.name || 'N/A'}</div>
+                            <div class="yelpingsince">${data.address || 'N/A'},${data.city || 'N/A'},${data.state || 'N/A'}</div>
+                        
+                            <div class="categories">${data.categories || ''}</div>
+
+
+                           
+                        </div>
+
+                        <div class="stats">
+                            <div class="box">
+                                <span class="value">${data.review_count || 'N/A'}</span>
+                                <span class="parameter">Review Count</span>
+                            </div>
+                            <div class="box">
+                                <span class="value">${data.stars || 'N/A'}</span>
+                                <span class="parameter">Average Stars</span>
+                            </div>
+                            <div class="box">
+                                <span class="value">${data.hours.Saturday|| 'N/A'}</span>
+                                <span class="parameter">Hours</span>
+                            </div>
+                          
+                        </div>
+                    </div>
+                `;
+                card.addEventListener("click", () => clickHandler(index));
+                parentElement.appendChild(card);
+            });
+
+        
+        }
+
+        // Function to handle user card click
+        function onUserCardClick(index) {
+            // Reset styles for user cards
+            document.querySelectorAll(".user-cards .card").forEach(card => card.classList.remove("selected"));
+            // Highlight the selected user card
+            document.querySelector(`.user-cards .card:nth-child(${index + 1})`).classList.add("selected");
+
+            // Hide business cards, predict button, and score
+            document.querySelector(".business-cards").style.display = "none";
+
+            selectedUserIndex = index;
+            user_selected = index;
+
+            // Enable or disable the predict button based on user and business selection
+            updatePredictButtonState();
+        }
+
+        // Function to handle business card click
+        function onBusinessCardClick(index) {
+            // Reset styles for business cards
+            document.querySelectorAll(".business-cards .card").forEach(card => card.classList.remove("selected"));
+            // Highlight the selected business card
+            document.querySelector(`.business-cards .card:nth-child(${index + 1})`).classList.add("selected");
+            selectedBusinessIndex = index;
+
+            // Enable or disable the predict button based on user and business selection
+            updatePredictButtonState();
+        }
+
+        // Function to enable or disable the predict button based on user and business selection
+        function updatePredictButtonState() {
+            const predictButton = document.getElementById("predict-button");
+            if (selectedUserIndex !== null && selectedBusinessIndex !== null) {
+                predictButton.disabled = false;
+            } else {
+                predictButton.disabled = true;
+            }
+        }
+
+        // Function to handle predict button click
+        function predict() {
+    // Check if both user and business are selected
+    if (selectedUserIndex !== null && selectedBusinessIndex !== null) {
+     
+
+
+        // Open the new page and pass the recommendation score as a query parameter
+        const newPage = window.open(`/predict/${selectedUserIndex}/${selectedBusinessIndex}`,'_blank');
+    }
+}
+
+
+    </script>
+</body>
+</html>
