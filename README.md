@@ -2,6 +2,9 @@
 
 Welcome to the Yelp Restaurants Recommendation System project! This system aims to provide personalized recommendations to users and predict user-business pairs based on their preferences and behavior using data mining techniques, Spark RDD, and collaborative filtering algorithms. 
 
+## Website
+https://yelprecommendationsystem.wl.r.appspot.com/
+
 # Note
 The files **app.py** and **RecommendationSystem.py**, which house the primary Spark code and application logic, are securely stored within a **private repository** in accordance with the project requirements. This project serves as an extension of a previous course project, facilitating user interaction through a user-friendly interface. Users can conveniently select users and businesses, enabling them to view recommendation scores with ease
 
@@ -11,9 +14,6 @@ The files **app.py** and **RecommendationSystem.py**, which house the primary Sp
 
 https://github.com/Sharvari289/Yelp-Restaurants-Recommendation-System-/assets/63462866/2cecdaab-60e6-4c43-9eb2-829157408156
 
-
-## Website
-https://yelprecommendationsystem.wl.r.appspot.com/
 
 
 ## Features
